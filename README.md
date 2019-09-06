@@ -1,4 +1,4 @@
-# Categorical Outlier - Detect anolamlies in categorical and date time features
+# CategoricalOutlier - Detect anolamlies in categorical data
 
 Categorical Outlier package was specially designed to detect outliers in categorical data. The project was built as there is no ready-to-use packages available to detect unusual patterns in categorical data. ALmost everything focuses on numerical features.
 
@@ -10,6 +10,10 @@ The categoricaloutlier was built to provide a score for the outlier-ness of the 
   - Supports time feature and converts it to 'time of the day', thereby, flagging an unusual time in a day
   - Supports 2-dimensional categorical features, flagging unusual combinations
 
+## Uniqueness
+It learns from the historical data to quantify the anomalous nature of a new observation. A feature high variance will get a low score for an unseen observation as compared to a feature with low or zero variance. 
+
+This is the first package that targets outliers amongst categorical features as opposed to innumerable libraries for numerical features.
 
 ## Usage
 
@@ -30,114 +34,51 @@ Categorical Outlier can be used by simple commands to get a score for outlier-ne
 from categoricaloutlier import TrainOutlier, PredictOutlier
 ```
 
-And you are ready to go! At this point, I want to clearly distinct between a TrainOutlier and a PredictOutlier.  
+And you are ready to go! At this point, I want to clearly distinct between a AnomalyTrainer and a AnomalyScorer.  
 
-## Website and Page
-As will notice that you can use all the methods for both *Page* and *Website* with the same argument calls. The only difference is that *Page* only gets you results from the specified URL while *Website* gives you results about the whole webpage with all its subsites. But let's have a look at the examples to make it clear:
+## AnomalyTrainer
+AnomalyTrainer class is used to train the categorical and date time features on the historical data. It build a fundamental profile from the data for the categorical features.
 
-## Initialize a Website
-First, let's create a new Website object. For this manner, just provide the url of the main page. I will use the URL of a website that I created years ago: [fahrschule-liechti.com](http://www.fahrschule-liechti.com). 
+### Parameters
+It expects 4 parameters to train a model -
+  - data - dataframe with all the rows and columns on which the model is to be trained on
+  - percentile_k - This is the threshold defined for outlier-ness. Default value is 99.9%. However, user can overwrite it based on data suitability
+  - cat_cols - This is the list of names of categorical columns. It has been left on the user to determine which columns needs to be included to determine outlier-ness
+  - datetime_cols - This is the name(s) of the datetime column within the data. 
 
+The current version supports day of the week and time of the day to determine anomalies. In future versions, the support may be extended to include other temporal features.
+
+The categorical columns can be 2-dimensional feature as well. 2-dimensional features are derive features by combining 2 categorical columns into one. This is imperative as in certain cases the combination might be unusual as opposed to independent features.
+
+Training the a new model is just two lines of code
+
+### Initalize the train object
+Let's create a new Anomaly trainer object with required parameters
 ```Python
-web = Website("http://www.fahrschule-liechti.com/")
+at = AnomalyTrainer(data,95,cat_cols,datetime_cols)
 ```
-
-#### Get Links of all subsites 
-Okay, now that we have our Website initialized, we are interested of all the subsites that exists on fahrschule-liechti.com. To find this out, ask the web-object to receive the links of all subpages.
-
+Make a call to train function to train the model on the data
 ```Python
-links = web.getSubpagesLinks()
+at.train()
 ```
+This trains the model on the data and gives an object of AnomalyTrainer Class. This object needs to passed to the scorer to generate scores for a new observation.
 
-Depending on your local internet connection and the server speed of the domain you are scraping, this request may take a while. Make sure to not scrape whole webpages with this method that are incredibly huge - like github.com for example. Github includes tousands if not billions of pages and links, and to digg through all of them may take hours. You can give it a shot - but use the page-scraping method described later to scrape such big sites. 
+## AnomalyScorer
+AnomalyScorer class is built to obtain the score of outlier-ness for a new observation of the same data. It uses a sigmoid function to provide a score between 1 to 100. 1 representing most similar to existing data and 100 representing most dissimilar to existing data.
 
-But back to the link-getting: By calling *.getSubpagesLinks()*, you request all subpages as links and will receive a list of urls. 
+### Parameters
+It expects 2 parameters to provide a score -
+  - at - AnomalyTrainer object is the train object created above for training the model
+  - test_data - It is a dataframe of test data which needs to be scored using the model
+ 
+The AnomalyScorer obtains the categorical and date time columns that was used at the time of training to predict a score. The test data should have at least one observation.
 
->['fahrschule-liechti.com', 'fahrschule-liechti.com/about', 'fahrschule-liechti.com/der-weg-motorrad' .... ]
-
-You may have noticed that the typical [*http://www.*](#)-stuff is missing. Thats un purpose and makes your live easier to further work with the links. But make sure that - when you actually want to call them in your browser or via requests - you add the http://www. in front of every link. 
-
-#### Find media
-Let's try to find links to all images that fahrschule-liechti.com placed on its website. We do that by calling the *.getImages()* method.
-
+Predicting a score is a one line code
 ```Python
-images = web.getImages()
+score = PredictOutlier(at,test_data)
 ```
+The result is an array of score(s) between 1 to 100 determining the outlier-ness of the data.
 
-The response will include links to all available images. 
-
->['fahrschule-liechti.com/wp-content/themes/zerif-lite/images/map25-redish.png', 'fahrschule-liechti.com/wp-content/uploads/2016/01/fabi-kreis.png' .... ]
-
-#### Download media
-Cool! Now let's do some more advanced stuff. We love the pictures that fahrschule-liechti.com has on its website, so let's download them all to our local disk. Sounds like a lot of work? Its actually deadly easy!
-
-```Python
-web.download("img", "fahrschule/images")
-```
-
-First, we defined to download all image-media via the keyword *img*. Next, we define the output folder, where the images should be saved to. Thats it! Run the Code and see whats happening. Within seconds, you have received all images there are on fahrschule-liechti.com. 
-
-#### Get linked domains
-Next, lets find out to what pages fahrschule-liechti.com is linking to. To get a general overview, let's just find out to what other domains it is linking to. For that reason, we specify to only get the domain-links.
-
-```Python
-domains = web.getLinks(intern=False, extern=False, domain=True)
-```
-
-What we get back is a list of all domains that are somewhere linked on fahrschule-liechti.com
->['orthotec.ch', 'wordpress.org', 'strassenverkehrsamt.lu.ch', 'themeisle.com', 'google.ch', 'astra.admin.ch', 'samariter-luzern.ch']
-
-All right, but now we want to gain further insights on these links. How do we do that?
-
-#### Get linked domains
-Well, more detailed links are nothing more than external links. So we do the same request but this time including externals, but not domains. 
-
-```Python
-domains = web.getLinks(intern=False, extern=True, domain=False)
-```
-
-Tadaa, we are getting all external links in full detail.
-
->['samariter-luzern.ch/cms/front_content.php', 'themeisle.com/themes/zerif-lite', 'orthotec.ch/de/pub/otc/fahrzeugumbau/fahrschulen.htm' ... ]
-
-## Initialize a Page
-Okay, by now we have seen quiet a bit about that Website-thing, but we have not discovered what Page does yet. Well, as said, page is just a single Site from a Website. Let's try it out on a different example by initializing a w3 schools page.
-
-```Python
-w3 = Page("https://www.w3schools.com/html/html5_video.asp")
-```
-
-You will see why I chose exactly this page in a second, if you have not already guessed.
-
-#### Downloading Videos 
-Yes, you have heard right. Scrapeasy lets you download videos from webpages in seconds. Let's have a look how.
-
-```Python
-w3.download("video", "w3/videos")
-```
-
-Yep, thats all. Just specify that you want to download all video media into the output folder w3/videos, and you are ready to go. Of course you could also just receive the link to the videos and download them later, but that would be less cool.
-
-```Python
-video_links = w3.getVideos()
-```
-
-#### Dowload other file types (like *pdf*  or *ics*)
-Let's be more general now. What about downloading special file types, like .pdf, .php or .ico? Use the general *.get()* method to receive the links, or the *.download()* method with the filetype as an argument.
-Lets use the get method to receive reiceive links to calendar data on the computer-science club of the university of Zurich, UZH:
-
-```Python
-calendar_links = Page("https://www.icu.uzh.ch/events/id/207").get("ics")
-```
-Done.
-
->['icu.uzh.ch//events/upcoming/icu-upcoming-events.ics', 'icu.uzh.ch//events/id/207/icu-event.ics']
-
-Let's Downlaod some PDF's now. We should already be experienced on how to use *.download()*, but I demonstrate it one last time.
-
-```Python
-Page("http://mathcourses.ch/mat182.html").download("pdf", "mathcourses/pdf-files")
-```
 
 
 
