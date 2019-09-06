@@ -1,4 +1,4 @@
-# CategoricalOutlier - Detect anolamlies in categorical and date time features
+# Categorical Outlier - Detect anolamlies in categorical and date time features
 
 Categorical Outlier package was specially designed to detect outliers in categorical data. The project was built as there is no ready-to-use packages available to detect unusual patterns in categorical data. ALmost everything focuses on numerical features.
 
