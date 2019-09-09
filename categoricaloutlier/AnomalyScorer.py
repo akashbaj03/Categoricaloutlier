@@ -5,7 +5,7 @@ class PredictOutlier:
     
     def predict_anomaly_detector(self):
         cols_freq = []
-        if(ano)
+        
         for c in anomalydetectorobject.cols:
             
             d = anomalydetectorobject.valuecountsdict[c]
