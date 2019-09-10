@@ -6,7 +6,7 @@ from scipy.spatial.distance import mahalanobis
 
 class TrainOutlier:
     
-    data = None
+    
     percentilek = None
     valuecountsdict = None
     colsum = None
@@ -16,8 +16,9 @@ class TrainOutlier:
     threshold = None
     datetimecols = None
     
-    def train(self):
-        df = self.data
+    
+    def train(self,df):
+        df
         
         if((self.cols != None) & (self.datetimecols != None)):
             df = df[self.cols+self.datetimecols]
@@ -47,8 +48,8 @@ class TrainOutlier:
     
     def get_datetimefeatures(self, df):
         for d in self.datetimecols:
-            df[d+'_weekday'] = self.data[d].apply(lambda m : m.weekday())
-            df[d+'_hourofday'] = self.data[d].apply(lambda m : m.hour)
+            df[d+'_weekday'] = df[d].apply(lambda m : m.weekday())
+            df[d+'_hourofday'] = df[d].apply(lambda m : m.hour)
             self.cols = self.cols + [d+'_weekday',d+'_hourofday']
         return df
         
@@ -91,8 +92,9 @@ class TrainOutlier:
         return(value_counts_dict)
     
     
-    def __init__(self,data,percentile_k = 99.9,cat_cols=None, datetime_cols=None):
-        self.data = data
+    def __init__(self,percentile_k = 99.9,cat_cols=None, datetime_cols=None):
+        
         self.percentilek = percentile_k
         self.cols = cat_cols
         self.datetimecols = datetime_cols
+        
