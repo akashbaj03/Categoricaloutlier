@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'categoricaloutlier',         # Name of the package
   packages = ['categoricaloutlier'],   
-  version = '0.4',      
+  version = '0.5',      
   license='MIT',        # MIT License
   description = 'Trains on categorical and date time features of the data and predicts an anomaly score for new data',   
   author = 'AKASH BAJPAI',                   
