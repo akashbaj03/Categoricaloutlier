@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'categoricaloutlier',         # Name of the package
   packages = ['categoricaloutlier'],   
-  version = '0.1',      
+  version = '0.4',      
   license='MIT',        # MIT License
   description = 'Trains on categorical and date time features of the data and predicts an anomaly score for new data',   
   author = 'AKASH BAJPAI',                   
@@ -12,7 +12,7 @@ setup(
   keywords = ['categorical', 'outlier', 'anomaly', 'unsupervised','datetime','frequency','probability'],   # Keywords that define your package best
   install_requires=['pandas','numpy','scipy'],
   classifiers=[
-    'Development Status :: 4 - Beta',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
+    'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
     'Intended Audience :: Developers',      # Define that your audience are developers
     'Topic :: Software Development :: Build Tools',
     'License :: OSI Approved :: MIT License',   
