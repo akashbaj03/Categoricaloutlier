@@ -1,3 +1,3 @@
 # Inside of __init__.py
-from categoricaloutlier.AnomalyTrainer import TrainOutlier
-from categoricaloutlier.AnomalyScorer import PredictScore
+from Categoricaloutlier.categoricaloutlier import TrainOutlier
+from Categoricaloutlier.categoricaloutlier import PredictScore
