@@ -2,12 +2,12 @@ from distutils.core import setup
 setup(
   name = 'categoricaloutlier',         # Name of the package
   packages = ['categoricaloutlier'],   
-  version = '0.5',      
+  version = '0.1.1',      
   license='MIT',        # MIT License
   description = 'Trains on categorical and date time features of the data and predicts an anomaly score for new data',   
   author = 'AKASH BAJPAI',                   
   author_email = 'akash.baj03@gmail.com',      
-  url = 'https://github.com/akashbaj03',   # Provide either the link to your github or to your website
+  url = 'https://github.com/akashbaj03/categoricaloutlier',   # Provide either the link to your github or to your website
   download_url = 'https://github.com/akashbaj03/categoricaloutlier/archive/categoricaloutlier_v0.1.tar.gz',    # Download link
   keywords = ['categorical', 'outlier', 'anomaly', 'unsupervised','datetime','frequency','probability'],   # Keywords that define your package best
   install_requires=['pandas','numpy','scipy'],
