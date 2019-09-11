@@ -5,8 +5,7 @@ import random
 from scipy.spatial.distance import mahalanobis
 
 class TrainOutlier:
-    
-    
+ 
     percentilek = None
     valuecountsdict = None
     colsum = None
