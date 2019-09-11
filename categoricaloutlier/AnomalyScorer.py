@@ -1,3 +1,9 @@
+import pandas as pd
+import numpy as np
+import scipy as sp
+import random
+from scipy.spatial.distance import mahalanobis
+
 class PredictOutlier:
     anomalydetectorobject = None
     testdata = None
@@ -22,7 +28,7 @@ class PredictOutlier:
 
         self.scores = self.sigmoid_curve(test_distance,self.anomalydetectorobject.threshold)
 
-        return self
+        return self.scores
     
     def sigmoid_curve(self,test_dist, k = 1):
         score = []
@@ -40,9 +46,9 @@ class PredictOutlier:
         
     
     def __init__(self,ad,td):
-        if(test_data.shape[0]) == 0:
+        if(td.shape[0]) == 0:
             raise ValueError('There should be at least one observation to predict score')
         self.anomalydetectorobject = ad
-        self.testdata = td
+        self.testdata = td.copy()
         self.predict_anomaly_detector()
         
