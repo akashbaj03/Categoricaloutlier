@@ -1,3 +1,4 @@
+"""Trainer class to build a model using the historical data."""
 import pandas as pd
 import numpy as np
 import scipy as sp
@@ -17,8 +18,16 @@ class TrainOutlier:
     
     
     def train(self,df):
-        df
-        
+        """Train method takes the entire dataframe
+        along with the categorical and datetime columns
+        to train on the data and generate fundamental 
+        training parameters.
+    Keyword arguments:
+        df : Dataframe of the training data
+    Returns
+    -------
+    self : returns a object of the class
+    """
         if((self.cols != None) & (self.datetimecols != None)):
             df = df[self.cols+self.datetimecols]
         elif(self.datetimecols == None):
@@ -46,6 +55,16 @@ class TrainOutlier:
         return self #value_counts_dict, df_sum_values, df_median_values, invcovmx, cols, threshold
     
     def get_datetimefeatures(self, df):
+      """Currently, the model supports 2 ways of datetime features
+      Weekday - extracts day of the week from the datetime
+      Hourofday - extracts hour of the day from the datetime.
+    Keyword arguments:
+        df : Dataframe of the training data
+        
+    Returns
+    -------
+        df : Dataframe with added weekday and hourofday
+     """
         for d in self.datetimecols:
             df[d+'_weekday'] = df[d].apply(lambda m : m.weekday())
             df[d+'_hourofday'] = df[d].apply(lambda m : m.hour)
@@ -54,6 +73,15 @@ class TrainOutlier:
         
         
     def get_inv_frequency_values(self,df,cols):
+     """ Performs an inverse of the frequency values for categorical data
+    Keyword arguments:
+        df : Dataframe of the training data
+        cols : Column names for categorical and datetime features
+    Returns
+    -------
+        df : Dataframe with added frequency values
+        cols_freq : Columns for which frequency values are derived
+     """
         cols_freq = []
         for c in cols:
             d = pd.DataFrame(df[c].value_counts()).reset_index()
@@ -64,6 +92,17 @@ class TrainOutlier:
         return(df,cols_freq)
 
     def get_probability_values(self,df,cols,cols_freq):
+     """ Obtains the probability values from the inverse frequency
+     P(xi) = (1/xi)/sum(1/x1,1/x2...1/xi...1/xn)
+    Keyword arguments:
+        df : Dataframe of the training data
+        cols : Column names for categorical and datetime features
+        cols_freq : column names for which frequency is obtained
+    Returns
+    -------
+        df : Dataframe with added weekday and hourofday
+        df_sum_values : Sum values for frequency columns
+     """
         df_sum_values = pd.DataFrame(df[cols_freq].apply(sum),columns=['sum']).reset_index()
         for c in cols_freq:
             v = df_sum_values.loc[df_sum_values['index'] == c,'sum'].values[0]
@@ -72,6 +111,19 @@ class TrainOutlier:
         return(df,df_sum_values)
 
     def get_mahalanobis_distance(self,df,df_median_values,cols_freq):
+     """ Mahalanobis distance is the metric used for quantifying the 
+     anomalous-ness of a new observation. Advantage of using MD is it
+     calculates the distance of an observation from the cluster and takes 
+     into account the direction of the observation.
+    Keyword arguments:
+        df : Dataframe of the training data
+        df_median_values : Median values for each categrical columns
+        cols_freq : column names for which frequency is obtained
+    Returns
+    -------
+        df_mahalanobis : Dataframe with Mahalanobis distance
+        invcovmx : Inverse Covariance Matrix
+     """
         #Calculate covariance matrix
         covmx = df[cols_freq].cov()
         invcovmx = sp.linalg.inv(covmx)
@@ -81,6 +133,15 @@ class TrainOutlier:
         return df_mahalanobis,invcovmx
 
     def get_value_counts_dict(self,df,cols):
+     """ Value counts for all the levels of the categorical columns are
+     obtained and stored to be used for prediction.
+    Keyword arguments:
+        df : Dataframe of the training data
+        cols : Column names for categorical and datetime features
+    Returns
+    -------
+        value_counts_dict : Dataframe of value counts for all categorical columns
+     """
         value_counts_dict = {}
 
         for c in cols:
@@ -92,7 +153,12 @@ class TrainOutlier:
     
     
     def __init__(self,percentile_k = 99.9,cat_cols=None, datetime_cols=None):
-        
+    """ Constructor for the class.
+    Keyword arguments:
+        percentile_k : Threshold percentile for defining anomaly
+        cat_cols : Categorical Column Names
+        datetime_cols : Datetime Column Names
+     """    
         self.percentilek = percentile_k
         self.cols = cat_cols
         self.datetimecols = datetime_cols
