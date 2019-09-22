@@ -1,3 +1,4 @@
+"""Scorer class to generate anomaly score for new observations."""
 import pandas as pd
 import numpy as np
 import scipy as sp
@@ -10,6 +11,17 @@ class PredictOutlier:
     scores = None
     
     def predict_anomaly_detector(self):
+        
+    """Predict function to obtaina score based on categorical data points.
+    
+    The method in turn calls other functions to obtain the probability and
+    mahalanobis distance of the new observation.
+    
+    Returns
+    -------
+    scores: array
+        array of scores for all the observation(s)
+    """
         cols_freq = []
         if(self.anomalydetectorobject.datetimecols != None):
             self.get_datetimefeatures()
@@ -31,6 +43,14 @@ class PredictOutlier:
         return self.scores
     
     def sigmoid_curve(self,test_dist, k = 1):
+    """Sigmoid function is used to fit the distance distribution.
+    It provides anomaly score between 0 and 100
+    
+    Returns
+    -------
+    score: value to quantify the anomaly-ness (0-100)
+        
+    """
         score = []
         for t in test_dist:
             v = 1.0/(1.0 + np.exp(-k*(np.log10(t) - np.log10(self.anomalydetectorobject.threshold))))
@@ -38,6 +58,10 @@ class PredictOutlier:
         return score
     
     def get_datetimefeatures(self):
+    """Extracts the supported date time features by the model.
+    Anomalous hour of the day and week day are flagged
+        
+    """
         for d in self.anomalydetectorobject.datetimecols:
             
             self.testdata[d+'_weekday'] = self.testdata[d].apply(lambda m : m.weekday())
@@ -46,6 +70,13 @@ class PredictOutlier:
         
     
     def __init__(self,ad,td):
+    """Constructor for the class.
+    
+    Keyword arguments:
+        ad : Object of the training class
+        
+        td : dataframe of test data
+    """
         if(td.shape[0]) == 0:
             raise ValueError('There should be at least one observation to predict score')
         self.anomalydetectorobject = ad
