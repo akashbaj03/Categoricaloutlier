@@ -53,13 +53,13 @@ The categorical columns can be 2-dimensional feature as well. 2-dimensional feat
 Training the a new model is just two lines of code
 
 ### Initalize the train object
-Let's create a new Anomaly trainer object with required parameters
+Let's create a new TrainOulier object and initialize required parameters. Ensure 'cat_cols' and 'datetime_cols' are lists and not array or any other sequence else it will throw an exception.
 ```Python
-at = AnomalyTrainer(data,95,cat_cols,datetime_cols)
+at = TrainOutlier(95,cat_cols,datetime_cols)
 ```
 Make a call to train function to train the model on the data
 ```Python
-at.train()
+at.train(df_train)
 ```
 This trains the model on the data and gives an object of AnomalyTrainer Class. This object needs to passed to the scorer to generate scores for a new observation.
 
@@ -75,9 +75,10 @@ The AnomalyScorer obtains the categorical and date time columns that was used at
 
 Predicting a score is a one line code
 ```Python
-score = PredictOutlier(at,test_data)
+outliers = PredictOutlier(at,test_data)
+outliers.scores
 ```
-The result is an array of score(s) between 1 to 100 determining the outlier-ness of the data.
+The result is an object of class PredictOutlier which has a scores variable that gives a score(s) between 0 to 1 determining the outlier-ness of the data.
 
 
 
@@ -86,8 +87,6 @@ License
 ----
 
 MIT License
-
-Copyright (c) 2018 Joel Barmettler
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
